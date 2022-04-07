@@ -2,17 +2,17 @@
   <img src="resources/mmdet-logo.png" width="600"/>
   <div>&nbsp;</div>
   <div align="center">
-    <b><font size="5">OpenMMLab website</font></b>
+    <b>OpenMMLab website</b>
     <sup>
       <a href="https://openmmlab.com">
-        <i><font size="4">HOT</font></i>
+        <i>HOT</i>
       </a>
     </sup>
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <b><font size="5">OpenMMLab platform</font></b>
+    <b>OpenMMLab platform</b>
     <sup>
       <a href="https://platform.openmmlab.com">
-        <i><font size="4">TRY IT OUT</font></i>
+        <i>TRY IT OUT</i>
       </a>
     </sup>
   </div>
@@ -74,10 +74,11 @@ This project is released under the [Apache 2.0 license](LICENSE).
 
 ## Changelog
 
-**2.21.0** was released in 8/2/2022:
+**2.23.0** was released in 28/3/2022:
 
-- Support CPU training
-- Allow to set parameters about multi-processing to speed up training and testing
+- Support [Mask2Former](configs/mask2former) and [EfficientNet](configs/efficientnet)
+- Support setting data root through environment variable `MMDET_DATASETS`, users don't have to modify the corresponding path in config files anymore.
+- Find a good recipe for fine-tuning high precision ResNet backbone pre-trained by Torchvision.
 
 Please refer to [changelog.md](docs/en/changelog.md) for details and release history.
 
@@ -162,6 +163,8 @@ Results and models are available in the [model zoo](docs/en/model_zoo.md).
       <td>
         <ul>
           <li><a href="configs/panoptic_fpn">Panoptic FPN (CVPR'2019)</a></li>
+          <li><a href="configs/maskformer">MaskFormer (NeurIPS'2021)</a></li>
+          <li><a href="configs/mask2former">Mask2Former (ArXiv'2021)</a></li>
         </ul>
       </td>
       <td>
@@ -178,7 +181,7 @@ Results and models are available in the [model zoo](docs/en/model_zoo.md).
           <li><b>Distillation</b></li>
         <ul>
         <ul>
-          <li><a href="configs/ld">Localization Distillation (ArXiv'2021)</a></li>
+          <li><a href="configs/ld">Localization Distillation (CVPR'2022)</a></li>
           <li><a href="configs/lad">Label Assignment Distillation (WACV'2022)</a></li>
         </ul>
         </ul>
@@ -225,6 +228,8 @@ Results and models are available in the [model zoo](docs/en/model_zoo.md).
         <li><a href="configs/pvt">PVT (ICCV'2021)</a></li>
         <li><a href="configs/swin">Swin (CVPR'2021)</a></li>
         <li><a href="configs/pvt">PVTv2 (ArXiv'2021)</a></li>
+        <li><a href="configs/resnet_strikes_back">ResNet strikes back (ArXiv'2021)</a></li>
+        <li><a href="configs/efficientnet">EfficientNet (ArXiv'2021)</a></li>
       </ul>
       </td>
       <td>
@@ -234,6 +239,7 @@ Results and models are available in the [model zoo](docs/en/model_zoo.md).
         <li><a href="configs/carafe">CARAFE (ICCV'2019)</a></li>
         <li><a href="configs/fpg">FPG (ArXiv'2020)</a></li>
         <li><a href="configs/groie">GRoIE (ICPR'2020)</a></li>
+        <li><a href="configs/dyhead">DyHead (CVPR'2021)</a></li>
       </ul>
       </td>
       <td>
@@ -252,6 +258,7 @@ Results and models are available in the [model zoo](docs/en/model_zoo.md).
           <li><a href="configs/gn+ws">Weight Standardization (ArXiv'2019)</a></li>
           <li><a href="configs/pisa">Prime Sample Attention (CVPR'2020)</a></li>
           <li><a href="configs/strong_baselines">Strong Baselines (CVPR'2021)</a></li>
+          <li><a href="configs/resnet_strikes_back">Resnet strikes back (ArXiv'2021)</a></li>
         </ul>
       </td>
     </tr>
@@ -269,7 +276,7 @@ Please refer to [get_started.md](docs/en/get_started.md) for installation.
 ## Getting Started
 
 Please see [get_started.md](docs/en/get_started.md) for the basic usage of MMDetection.
-We provide [colab tutorial](demo/MMDet_Tutorial.ipynb), and full guidance for quick run [with existing dataset](docs/en/1_exist_data_model.md) and [with new dataset](docs/en/2_new_data_model.md) for beginners.
+We provide [detection colab tutorial](demo/MMDet_Tutorial.ipynb) and [instance segmentation colab tutorial](demo/MMDet_InstanceSeg_Tutorial.ipynb), and full guidance for quick run [with existing dataset](docs/en/1_exist_data_model.md) and [with new dataset](docs/en/2_new_data_model.md) for beginners.
 There are also tutorials for [finetuning models](docs/en/tutorials/finetune.md), [adding new dataset](docs/en/tutorials/customize_dataset.md), [designing data pipeline](docs/en/tutorials/data_pipeline.md), [customizing models](docs/en/tutorials/customize_models.md), [customizing runtime settings](docs/en/tutorials/customize_runtime.md) and [useful tools](docs/en/useful_tools.md).
 
 Please refer to [FAQ](docs/en/faq.md) for frequently asked questions.
@@ -321,4 +328,4 @@ If you use this toolbox or benchmark in your research, please cite this project.
 - [MMFlow](https://github.com/open-mmlab/mmflow): OpenMMLab optical flow toolbox and benchmark.
 - [MMEditing](https://github.com/open-mmlab/mmediting): OpenMMLab image and video editing toolbox.
 - [MMGeneration](https://github.com/open-mmlab/mmgeneration): OpenMMLab image and video generative models toolbox.
-- [MMDeploy](https://github.com/open-mmlab/mmdeploy): OpenMMLab Model Deployment Framework.
+- [MMDeploy](https://github.com/open-mmlab/mmdeploy): OpenMMLab model deployment framework.
