@@ -15,7 +15,7 @@ model = dict(
         out_channels=128,
         num_csp_blocks=1),
     bbox_head=dict(
-        type='YOLOXHead', num_classes=3, in_channels=128, feat_channels=128),
+        type='YOLOXHead', num_classes=1, in_channels=128, feat_channels=128),
     train_cfg=dict(assigner=dict(type='SimOTAAssigner', center_radius=2.5)),
     # In order to align the source code, the threshold of the val phase is
     # 0.01, and the threshold of the test phase is 0.001.
@@ -120,10 +120,10 @@ optimizer = dict(
     paramwise_cfg=dict(norm_decay_mult=0., bias_decay_mult=0.))
 optimizer_config = dict(grad_clip=None)
 
-max_epochs = 300
-num_last_epochs = 15
+max_epochs = 30
+num_last_epochs = 5
 resume_from = None
-interval = 10
+interval = 5
 
 # learning policy
 lr_config = dict(
@@ -133,7 +133,7 @@ lr_config = dict(
     by_epoch=False,
     warmup_by_epoch=True,
     warmup_ratio=1,
-    warmup_iters=5,  # 5 epoch
+    warmup_iters=3,  # 3 epoch
     num_last_epochs=num_last_epochs,
     min_lr_ratio=0.05)
 
@@ -166,5 +166,5 @@ checkpoint_config = dict(interval=interval)
 #     interval=interval,
 #     dynamic_intervals=[(max_epochs - num_last_epochs, 1)],
 #     metric='bbox')
-evaluation = dict(interval=1, metric='bbox')
-log_config = dict(interval=200)
+evaluation = dict(interval=100, metric='bbox')
+log_config = dict(interval=100)
