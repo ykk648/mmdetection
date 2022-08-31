@@ -6,6 +6,9 @@ from mmcv.utils import print_log
 from mmdet.core import eval_map, eval_recalls
 from .builder import DATASETS
 from .xml_style import XMLDataset
+import os.path as osp
+import numpy as np
+import xml.etree.ElementTree as ET
 
 
 @DATASETS.register_module()
@@ -113,7 +116,7 @@ class VOCDataset(XMLDataset):
 
 @DATASETS.register_module()
 class Handd2Dataset(VOCDataset):
-    CLASSES = ('targetobject', 'hand')
+    CLASSES = ('targetobject', 'hand_r', 'hand_l')
 
     def __init__(self, **kwargs):
         super(VOCDataset, self).__init__(**kwargs)
@@ -195,3 +198,79 @@ class Handd2Dataset(VOCDataset):
                 for i, num in enumerate(proposal_nums):
                     eval_results[f'AR@{num}'] = ar[i]
         return eval_results
+
+    def get_ann_info(self, idx):
+        """Get annotation from XML file by index.
+
+        Args:
+            idx (int): Index of data.
+
+        Returns:
+            dict: Annotation info of specified index.
+        """
+
+        img_id = self.data_infos[idx]['id']
+        xml_path = osp.join(self.img_prefix, self.ann_subdir, f'{img_id}.xml')
+        tree = ET.parse(xml_path)
+        root = tree.getroot()
+        bboxes = []
+        labels = []
+        bboxes_ignore = []
+        labels_ignore = []
+        for obj in root.findall('object'):
+            name = obj.find('name').text
+            if name == 'targetobject':
+                label = self.cat2label['targetobject']
+            elif name == 'hand':
+                handside = obj.find('handside').text
+                if handside == '1':
+                    label = self.cat2label['hand_r']
+                elif handside == '0':
+                    label = self.cat2label['hand_l']
+            else:
+                continue
+            # if name not in self.CLASSES:
+            #     continue
+            # label = self.cat2label[name]
+            difficult = obj.find('difficult')
+            difficult = 0 if difficult is None else int(difficult.text)
+            bnd_box = obj.find('bndbox')
+            # TODO: check whether it is necessary to use int
+            # Coordinates may be float type
+            bbox = [
+                int(float(bnd_box.find('xmin').text)),
+                int(float(bnd_box.find('ymin').text)),
+                int(float(bnd_box.find('xmax').text)),
+                int(float(bnd_box.find('ymax').text))
+            ]
+            ignore = False
+            if self.min_size:
+                assert not self.test_mode
+                w = bbox[2] - bbox[0]
+                h = bbox[3] - bbox[1]
+                if w < self.min_size or h < self.min_size:
+                    ignore = True
+            if difficult or ignore:
+                bboxes_ignore.append(bbox)
+                labels_ignore.append(label)
+            else:
+                bboxes.append(bbox)
+                labels.append(label)
+        if not bboxes:
+            bboxes = np.zeros((0, 4))
+            labels = np.zeros((0,))
+        else:
+            bboxes = np.array(bboxes, ndmin=2) - 1
+            labels = np.array(labels)
+        if not bboxes_ignore:
+            bboxes_ignore = np.zeros((0, 4))
+            labels_ignore = np.zeros((0,))
+        else:
+            bboxes_ignore = np.array(bboxes_ignore, ndmin=2) - 1
+            labels_ignore = np.array(labels_ignore)
+        ann = dict(
+            bboxes=bboxes.astype(np.float32),
+            labels=labels.astype(np.int64),
+            bboxes_ignore=bboxes_ignore.astype(np.float32),
+            labels_ignore=labels_ignore.astype(np.int64))
+        return ann
