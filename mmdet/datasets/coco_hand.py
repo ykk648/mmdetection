@@ -21,8 +21,7 @@ from .custom import CustomDataset
 
 @DATASETS.register_module()
 class CocoHandDataset(CustomDataset):
-
-    CLASSES = ('hand')
+    CLASSES = ('hand', )
 
     PALETTE = [(220, 20, 60)]
 
@@ -340,7 +339,7 @@ class CocoHandDataset(CustomDataset):
         assert isinstance(results, list), 'results must be a list'
         assert len(results) == len(self), (
             'The length of results is not equal to the dataset len: {} != {}'.
-            format(len(results), len(self)))
+                format(len(results), len(self)))
 
         if jsonfile_prefix is None:
             tmp_dir = tempfile.TemporaryDirectory()

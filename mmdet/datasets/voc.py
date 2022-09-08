@@ -116,7 +116,8 @@ class VOCDataset(XMLDataset):
 
 @DATASETS.register_module()
 class Handd2Dataset(VOCDataset):
-    CLASSES = ('targetobject', 'hand_r', 'hand_l')
+    # CLASSES = ('targetobject', 'hand_r', 'hand_l')
+    CLASSES = ('hand',)
 
     def __init__(self, **kwargs):
         super(VOCDataset, self).__init__(**kwargs)
@@ -220,13 +221,14 @@ class Handd2Dataset(VOCDataset):
         for obj in root.findall('object'):
             name = obj.find('name').text
             if name == 'targetobject':
-                label = self.cat2label['targetobject']
+                # label = self.cat2label['targetobject']
+                continue
             elif name == 'hand':
                 handside = obj.find('handside').text
                 if handside == '1':
-                    label = self.cat2label['hand_r']
+                    label = self.cat2label['hand']
                 elif handside == '0':
-                    label = self.cat2label['hand_l']
+                    label = self.cat2label['hand']
             else:
                 continue
             # if name not in self.CLASSES:

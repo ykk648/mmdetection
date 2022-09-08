@@ -22,8 +22,7 @@ model = dict(
     test_cfg=dict(score_thr=0.01, nms=dict(type='nms', iou_threshold=0.65)))
 
 # dataset settings
-dataset_type = 'CocoHandDataset'
-data_root = 'data/multi_view_0616/'
+
 
 train_pipeline = [
     dict(type='Mosaic', img_scale=img_scale, pad_val=114.0),
@@ -70,7 +69,10 @@ test_pipeline = [
             dict(type='Collect', keys=['img'])
         ])
 ]
-train_dataset = dict(
+
+dataset_type = 'CocoHandDataset'
+data_root = 'data/multi_view_0616/'
+dataset_A_train = dict(
     type='MultiImageMixDataset',
     dataset=dict(
         type=dataset_type,
@@ -84,30 +86,59 @@ train_dataset = dict(
     ),
     pipeline=train_pipeline)
 
+dataset_type = 'CocoHandDataset'
+data_root = 'data/datasets_TVCOCO_hand_train/'
+dataset_A_2_train = dict(
+    type='MultiImageMixDataset',
+    dataset=dict(
+        type=dataset_type,
+        ann_file=data_root + 'coco_label_out.json',
+        img_prefix=data_root + 'images/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True)
+        ],
+        filter_empty_gt=False,
+    ),
+    pipeline=train_pipeline)
+
+dataset_type = 'Handd2Dataset'
+data_root = 'data/VOCdevkit2007_handobj_100K/'
+dataset_B_train = dict(
+    type='MultiImageMixDataset',
+    dataset=dict(
+        type=dataset_type,
+        ann_file=data_root + 'VOC2007/ImageSets/Main/trainval.txt',
+        img_prefix=data_root + 'VOC2007/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True)
+        ],
+        filter_empty_gt=False,
+    ),
+    pipeline=train_pipeline)
+
+dataset_type = 'Handd2Dataset'
 data = dict(
     samples_per_gpu=24,
     workers_per_gpu=8,
-    train=train_dataset,
-    # train=dict(
-    #     type='RepeatDataset',
-    #     times=3,
-    #     dataset=dict(
-    #         type=dataset_type,
-    #         ann_file=[
-    #             data_root + 'VOC2007/ImageSets/Main/trainval.txt',
-    #         ],
-    #         img_prefix=[data_root + 'VOC2007/'],
-    #         pipeline=train_pipeline)),
+    # train=dataset_A_train,
+    train=[
+        dataset_A_train,
+        # dataset_A_2_train,
+        # dataset_B_train
+    ],
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/multi_view_0616_concat.json',
-        img_prefix=data_root + 'images/',
+        ann_file=data_root + 'VOC2007/ImageSets/Main/test.txt',
+        img_prefix=data_root + 'VOC2007/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/multi_view_0616_concat.json',
-        img_prefix=data_root + 'images/',
-        pipeline=test_pipeline))
+        ann_file=data_root + 'VOC2007/ImageSets/Main/test.txt',
+        img_prefix=data_root + 'VOC2007/',
+        pipeline=test_pipeline)
+)
 
 # optimizer
 # default 8 gpu
@@ -120,10 +151,10 @@ optimizer = dict(
     paramwise_cfg=dict(norm_decay_mult=0., bias_decay_mult=0.))
 optimizer_config = dict(grad_clip=None)
 
-max_epochs = 30
+max_epochs = 85
 num_last_epochs = 5
-resume_from = None
-interval = 5
+resume_from = 'work_dirs/yolox_s_8x8_300e_coco_local_hand_3_dateset/epoch_80.pth'
+interval = 10
 
 # learning policy
 lr_config = dict(
@@ -133,7 +164,7 @@ lr_config = dict(
     by_epoch=False,
     warmup_by_epoch=True,
     warmup_ratio=1,
-    warmup_iters=3,  # 3 epoch
+    warmup_iters=5,  # 5 epoch
     num_last_epochs=num_last_epochs,
     min_lr_ratio=0.05)
 
@@ -155,7 +186,7 @@ custom_hooks = [
         momentum=0.0001,
         priority=49)
 ]
-load_from = './work_dirs/yolox_s_8x8_300e_handd2_without_handside/epoch_90.pth'
+load_from = './work_dirs/yolox_s_8x8_300e_coco_local_hand/latest.pth'
 checkpoint_config = dict(interval=interval)
 # evaluation = dict(
 #     save_best='auto',
@@ -166,5 +197,5 @@ checkpoint_config = dict(interval=interval)
 #     interval=interval,
 #     dynamic_intervals=[(max_epochs - num_last_epochs, 1)],
 #     metric='bbox')
-evaluation = dict(interval=100, metric='bbox')
+evaluation = dict(interval=10, metric='bbox')
 log_config = dict(interval=100)
